@@ -1,0 +1,25 @@
+{
+  "name": "kbc.app.External",
+  "version": "0.0.0",
+  "dependencies": {
+  "jquery": "~1.9.1",
+  "bootstrap": "~3.0.2",
+  "underscore": "~1.4.4",
+  "underscore.string": "~2.3.1",
+  "font-awesome": "4.0.3",
+  "angular-kb": "~0.8.0",
+  "angular-kb-accordion": "~0.1.0",
+  "angular-ui-bootstrap-bower": "~0.10.0",
+
+  "angular": "~1.2.0",
+  "angular-resource": "~1.2.0",
+  "angular-sanitize": "~1.2.0",
+  "angular-route": "~1.2.0"
+
+  },
+  "devDependencies": {
+    "angular-mocks": "~1.2.0",
+    "angular-scenario": "~1.2.0"
+  }
+}
+

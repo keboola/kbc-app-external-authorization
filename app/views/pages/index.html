@@ -1,0 +1,22 @@
+<div class="page-header">
+    <div class="container">
+        <h4>
+            {{ appName }}
+            <kb-loader is-loading="bucketsLoading" bs-tooltip="'Reload all'" ng-click="refresh()"></kb-loader>
+        </h4>
+    </div>
+</div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-9">
+            <ul>
+                <li ng-repeat="bucket in buckets">{{ bucket.id }}</li>
+            </ul>
+        </div>
+
+        <div class="col-md-3">
+
+        </div>
+    </div>
+</div>

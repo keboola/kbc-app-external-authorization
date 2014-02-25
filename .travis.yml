@@ -1,0 +1,17 @@
+language: node_js
+node_js:
+- '0.10'
+notifications:
+  email: false
+branches:
+  only:
+  - master
+install:
+- time gem install compass
+- time npm install -g grunt-cli bower
+- time npm install
+- bower --version
+- time bower install --dev
+script: grunt
+after_success:
+- grunt upload-release
