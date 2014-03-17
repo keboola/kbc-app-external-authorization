@@ -328,7 +328,6 @@ module.exports = (grunt) ->
     "coffeelint"
     "coffee"
     "connect:test"
-    "karma"
     "useminPrepare"
     "compass"
     "copy:styles"

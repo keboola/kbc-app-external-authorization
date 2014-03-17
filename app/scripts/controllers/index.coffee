@@ -4,23 +4,25 @@ angular.module('kbc.app.External')
     "$scope"
     "kbSapiService"
     "kbc.app.External.config"
-    ($scope, storageService, config) ->
+    "$timeout"
+    ($scope, storageService, config,$timeout) ->
+      
+      #-----------------------------------
+      # Los alertos
+      #---------------------------------
+      $scope.alerts = []
+      $scope.closeAlert = (index) ->
+        $scope.alerts.splice(index, 1)
+      
+      
 
-      $scope.appName = config.appName
-      $scope.buckets = []
-      $scope.bucketsLoading = false
+      $scope.addAlert = (type, msg) ->
+        alert = type: type, msg: msg
+        $scope.alerts.push(alert)
+        $timeout (->
+          $scope.closeAlert($scope.alerts.indexOf(alert))
+        ), 5000
+        
+      
 
-      $scope.refresh = ->
-        $scope.bucketsLoading = true
-        storageService
-          .getBuckets()
-          .success( (buckets) ->
-            $scope.bucketsLoading = false
-            $scope.buckets = buckets
-          )
-          .error( ->
-            $scope.bucketsLoading  = false
-          )
-
-      $scope.refresh()
   ])

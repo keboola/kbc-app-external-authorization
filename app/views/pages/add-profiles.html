@@ -1,0 +1,78 @@
+﻿<div class="page-header">
+    <div class="container">
+
+        <h4 class="inline">
+           
+            <span>Google Analytics - Select Profiles </span>            
+            <!--<kb-run-button               
+                 class="btn" tooltip="Run this config" is-running="isRunning()" ng-click="run()"></kb-run-button>-->
+        </h4>
+        <kb-loader is-loading="loading" ng-show="loading" tooltip="loading profiles.."></kb-loader>
+
+    </div>
+
+</div>
+
+<div class="row">
+        <div class="col-md-12">
+            <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+        </div>
+    </div>
+
+
+
+<div class="container">
+
+    <div class="row">
+        <div class="col-md-12">
+            {{ configDescription }}
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
+        </div>
+    </div>
+
+    
+
+    <div class="col-md-12" ng-hide="loading">
+        <h4>Select profiles</h4>
+        <input type="text" class="form-control" placeholder="type to filter" ng-model="q" />
+        <div class="well">
+
+            <ul class="list-unstyled list-inline">
+                <li ng-repeat="profile in profiles|filter:q">
+                    <button  class="btn btn-default btn-xs" ng-click="selectProfile(profile.googleId)" ng-disabed="isSaving">
+                        {{profile.name}}</button>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="col-md-12" ng-hide="loading">
+        <h4>Selected profiles:</h4>
+        <div class="well">
+            <ul class="list-unstyled list-inline">
+                <li ng-repeat="profile in selectedProfiles">
+                    <button class="btn btn-default btn-xs">
+                        {{profile.name}}
+                        <button type="button" class="close" ng-click="unselectProfile(profile.googleId)" ng-disabed="isSaving">&times;</button>
+                    </button>
+                </li>
+            </ul>
+
+        </div>
+
+    </div>
+
+    <div class="form-actions" ng-hide="loading">
+        <span class="text-error pull-right">{{error}}</span>
+        <kb-loader is-loading="isSaving" ng-show="isSaving"></kb-loader>
+        <!--<button class="btn btn-default pull-center" ng-click="cancel()" ng-disabled="isSaving">Cancel</button> -->
+        <button class="btn btn-primary pull-center" ng-click="submit()" ng-disabled="isSaving|| !selectedProfiles.length ">Save selection</button>
+
+    </div>
+</div>

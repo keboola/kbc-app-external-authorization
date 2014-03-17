@@ -52,8 +52,16 @@ angular
 
     $routeProvider
     .when('/',
-        templateUrl: appVersionProvider.versionUrl("views/pages/index.html")
+        templateUrl: "views/pages/index.html"
         controller: 'IndexController'
+      )
+    .when('/googledrive',
+        templateUrl: "views/pages/add-new-sheet.html"
+        controller: 'AddsheetController'
+      )
+    .when('/googleanalytics',
+        templateUrl: "views/pages/add-profiles.html"
+        controller: 'AddProfilesController'
       )
     .otherwise(
         redirectTo: '/'
