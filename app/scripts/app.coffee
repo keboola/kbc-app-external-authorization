@@ -59,6 +59,19 @@ angular
     .when('/googledrive',
         templateUrl: "views/pages/add-new-sheet.html"
         controller: 'AddsheetController'
+        resolve:
+          gdriveendpoint: ["Gdriveservice","$http", (gdriveService, $http) ->
+            $http(
+              url: "https://connection.keboola.com/v2/storage"
+              method: "GET"
+            ).then (result) ->
+              endpoint = _.find(result.data.components, (c) ->
+                c.id == "ex-google-drive"
+                )
+              gdriveService.setEndpoint(endpoint.uri)
+              console.log endpoint.uri
+              endpoint.uri
+            ]
       )
     .when('/googleanalytics',
         templateUrl: "views/pages/add-profiles.html"
