@@ -24,8 +24,8 @@ module.exports = (grunt) ->
         files: ['<%= yeoman.app %>/styles/*.{scss,sass}'],
         tasks: ['compass:server']
       coffee:
-        files: ["<%= yeoman.app %>/scripts/{,*/}*.coffee"]
-        tasks: ["newer:coffee:dist"]
+        files: ["<%= yeoman.app %>/scripts/**/*.coffee"]
+        tasks: ["newer:coffeelint", "newer:coffee:dist"]
       coffeeBootstrap:
         files: ["<%= yeoman.app %>/bootstrap.coffee"]
         tasks: ["newer:coffee:bootstrap"]
@@ -92,17 +92,12 @@ module.exports = (grunt) ->
         options:
           debugInfo: true
 
-    karma:
-      unit:
-        configFile: "karma.conf.js"
-        singleRun: true
-
     coffee:
       dist:
         files: [
           expand: true
           cwd: "<%= yeoman.app %>/scripts"
-          src: '{,*/}*.coffee',
+          src: '**/*.coffee',
           dest: ".tmp/scripts"
           ext: ".js"
         ]
@@ -127,45 +122,44 @@ module.exports = (grunt) ->
       html: "<%= yeoman.app %>/index.html"
       options:
         dest: "<%= yeoman.dist %>"
+        flow: {
+          html: {
+            steps: {
+              js: ['concat', 'uglifyjs'],
+              css: ['cssmin']
+            },
+            post: {}
+          }
+        }
 
     usemin:
       html: ["<%= yeoman.dist %>/{,*/}*.html"]
       css: ["<%= yeoman.dist %>/styles/{,*/}*.css"]
       options:
-        dirs: ["<%= yeoman.dist %>"]
+        dist: '<%= yeoman.dist %>'
+
 
     cssmin: {}
 
-    htmlmin:
-      dist:
-        options: {}
-
-      #removeCommentsFromCDATA: true,
-      #          // https://github.com/yeoman/grunt-usemin/issues/44
-      #          //collapseWhitespace: true,
-      #          collapseBooleanAttributes: true,
-      #          removeAttributeQuotes: true,
-      #          removeRedundantAttributes: true,
-      #          useShortDoctype: true,
-      #          removeEmptyAttributes: true,
-      #          removeOptionalTags: true
-        files: [
-          expand: true
-          cwd: "<%= yeoman.app %>"
-          src: ["*.html", "views/**/*.html"]
-          dest: "<%= yeoman.dist %>"
-        ]
-
-    ngmin:
-      dist:
-        files: [
-          expand: true
-          cwd: "<%= yeoman.dist %>/scripts"
-          src: "*.js"
-          dest: "<%= yeoman.dist %>/scripts"
-        ]
 
     uglify: {}
+
+    ngtemplates:
+      dist:
+        options:
+          module: 'kbc.app.External'
+          htmlmin:
+            collapseBooleanAttributes:      true
+            collapseWhitespace:             false
+            removeAttributeQuotes:          true
+            removeComments:                 true
+            removeEmptyAttributes:          true
+            removeRedundantAttributes:      true
+            removeScriptTypeAttributes:     true
+            removeStyleLinkTypeAttributes:  true
+        cwd: '<%= yeoman.app %>'
+        src: 'views/**/*.html'
+        dest: '.tmp/scripts/templates.js'
 
     copy:
       dist:
@@ -174,7 +168,7 @@ module.exports = (grunt) ->
           dot: true
           cwd: "<%= yeoman.app %>"
           dest: "<%= yeoman.dist %>"
-          src: ["*.{ico,txt}", ".htaccess", "components/**/*", "images/{,*/}*.{gif,webp}"]
+          src: ["*.{ico,txt}", ".htaccess", "components/**/*", "images/{,*/}*.{gif,webp}", "index.html"]
         ,
           expand: true
           dot: true
@@ -197,13 +191,7 @@ module.exports = (grunt) ->
           dot: true
           cwd: "<%= yeoman.dist %>"
           dest: "release"
-          src: ["images/**/*.{gif,webp}", "styles/*", "scripts/*", "views/**"]
-        ,
-          expand: true
-          cwd: "<%= yeoman.app %>"
-          dest: "release"
-          src: ["components/font-awesome/fonts/**"]
-
+          src: ["images/**/*.{gif,webp}", "styles/*", "scripts/*"]
         ]
 
     'aws_s3':
@@ -320,21 +308,19 @@ module.exports = (grunt) ->
     "clean:server"
     "coffee"
     "connect:test"
-    "karma"
   ]
 
   grunt.registerTask "build", [
     "clean:dist"
     "coffeelint"
     "coffee"
+    "ngtemplates"
     "connect:test"
     "useminPrepare"
     "compass"
     "copy:styles"
     "concat"
     "cssmin"
-    "htmlmin"
-    "ngmin"
     "uglify"
     "copy:dist"
     "usemin"

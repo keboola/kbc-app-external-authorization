@@ -1,4 +1,3 @@
-
 angular.module('kbc.app.External')
   .controller('AddsheetController', [
     "$scope"
@@ -256,25 +255,3 @@ angular.module('kbc.app.External')
 
 
   ])
-
-  """
-        $scope.appName = config.appName
-      $scope.buckets = []
-      $scope.bucketsLoading = false
-
-      $scope.refresh = ->
-        $scope.bucketsLoading = true
-        storageService
-          .getBuckets()
-          .success( (buckets) ->
-            $scope.bucketsLoading = false
-            $scope.buckets = buckets
-          )
-          .error( ->
-            $scope.bucketsLoading  = false
-          )
-
-      $scope.refresh()
-
-
-      """
