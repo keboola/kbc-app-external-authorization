@@ -20,6 +20,7 @@
         <!-- build:css(app) styles/libs.css -->
         <link rel="stylesheet" href="components/angular-kb/docs/build/angular-kb.css">
         <link href="components/select2/select2.css" rel="stylesheet" />
+  <link rel="stylesheet" href="components/ngprogress/ngProgress.css">
         <!-- endbuild -->
 </head>
   <body>
@@ -28,7 +29,7 @@
   <ng-view></ng-view>
 
   <script src="components/jquery/jquery.js"></script>
-        <!-- build:js scripts/libs.js -->
+  <!-- build:js({.tmp,app}) scripts/scripts.js -->
         <script src="components/underscore/underscore.js"></script>
         <script src="components/underscore.string/lib/underscore.string.js"></script>
         <script src="components/select2/select2.js"></script>
@@ -40,22 +41,16 @@
         <script src="components/angular-route/angular-route.js"></script>
         <script src="components/angular-kb/docs/build/angular-kb.js"></script>
         <script src="components/angular-kb-accordion/dist/angular-kb-accordion.js"></script>
-        <script src="components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>        
+        <script src="components/angular-ui-bootstrap-bower/ui-bootstrap-tpls.js"></script>
         <script src="components/angular-ui-utils/ui-utils.js"></script>
-        <!-- endbuild -->
-
-        <!-- build:js({.tmp,app}) scripts/scripts.js -->
+  <script src="components/ngprogress/build/ngProgress.js"></script>
         <script src="scripts/app.js"></script>
-
+  <script src="scripts/templates.js"></script>
         <script src="scripts/services/gdriveService.js"></script>
         <script src="scripts/services/google-anaytics-service.js"></script>
-
         <script src="scripts/controllers/index.js"></script>
         <script src="scripts/controllers/AddSheet.js"></script>
         <script src="scripts/controllers/add-profiles.js"></script>
-
-        
-
         <!-- endbuild -->
 <script src="bootstrap.js"></script></body>
 </html>

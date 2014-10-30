@@ -16,7 +16,7 @@ angular
 angular
 .module('kbc.app.External', [
   # ng modules
-  
+
   'ngResource'
   'ngSanitize'
   'ngRoute'
@@ -34,6 +34,7 @@ angular
 
   # third party library modules
   'ui.bootstrap'
+  'ngProgress'
 ])
 .config([
   '$routeProvider'
@@ -69,6 +70,29 @@ angular
 
     $locationProvider.html5Mode(false)
 ])
+.run([
+    '$rootScope'
+    'ngProgress'
+    ($rootScope, ngProgress) ->
+
+      $rootScope.$on '$routeChangeStart',  ->
+        ngProgress.color('green')
+        ngProgress.height(1)
+        ngProgress.reset()
+        ngProgress.start()
+
+      _.each ['$routeChangeSuccess', '$routeChangeError'], (event) ->
+        $rootScope.$on event, ->
+          ngProgress.complete()
+
+  ])
+.run([
+  '$rootScope'
+  '$modalStack'
+  ($rootScope, $modalStack) ->
+    $rootScope.$on '$routeChangeSuccess', ->
+      $modalStack.dismissAll()
+])
 
 # initialization
 .run([
@@ -99,4 +123,3 @@ angular
     $rootScope.appConfig = appConfig
 
 ])
-
