@@ -11,7 +11,6 @@ angular.module('kbc.app.External')
     "kbc.app.External.config"
     "$rootScope"
     (storageService, $routeParams, $q, csv,  $http, $location, $window, $sce, config, $rootScope) ->
-
       configBucketName = "ex-googleDrive"
       configBucketId = "sys.c-" + configBucketName
       configTableName = $location.search()["account"]#$routeParams.config
@@ -50,8 +49,9 @@ angular.module('kbc.app.External')
       #---------------------------------
       appendTokenToHeader = (params) ->
         params.headers = {} if !params.headers
+        #KBC EXTERNAL AUTHORIZATION APP SPECIFIC!!!! - set token
         angular.extend params.headers,
-          'X-StorageApi-Token': storageService.apiToken
+          'X-StorageApi-Token': $location.search().token
 
       #-----------------------------------
       # Reset google drive account

@@ -109,7 +109,7 @@ angular
   'kbAppVersion'
   'kbc.app.External.config'
   '$rootElement'
-  ($rootScope, storageErrorHandler, storageService, appVersion, appConfig, $rootElement) ->
+  ($rootScope, storageErrorHandler, storageService, appVersion, appConfig, $rootElement, $routeParams) ->
     getComponentConfig = (id) ->
       component = _.find(appConfig.components, (component) ->
         component.id == id
@@ -121,7 +121,6 @@ angular
     $rootScope.$on('storageError', (event, errorResponse) ->
       storageErrorHandler.handleError(errorResponse)
     )
-
     # set tokens and urls for SAPI and TAPI
     storageService.setVerifiedToken(appConfig.sapi.token)
     storageService.endpoint = appConfig.sapi.endpoint
