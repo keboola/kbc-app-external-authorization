@@ -57,20 +57,14 @@ angular
         controller: 'IndexController'
       )
     .when('/googledrive',
-        templateUrl: "views/pages/add-new-sheet.html"
-        controller: 'AddsheetController'
+        templateUrl: "views/pages/sheets.html"
+        controller: 'SheetsController'
         resolve:
-          gdriveendpoint: ["Gdriveservice","$http", (gdriveService, $http) ->
-            $http(
-              url: "https://connection.keboola.com/v2/storage"
-              method: "GET"
-            ).then (result) ->
-              endpoint = _.find(result.data.components, (c) ->
-                c.id == "ex-google-drive"
-                )
-              gdriveService.setEndpoint(endpoint.uri)
-              console.log endpoint.uri
-              endpoint.uri
+          sheetsAndAccount: ['Gdriveservice', (gdservice) ->
+            gdservice.loadSavedSheetsListAndAccount()
+            ]
+          gdFilesPromise:['Gdriveservice', (gdservice) ->
+            gdservice.getFilesFromGdrivePromise()
             ]
       )
     .when('/googleanalytics',
@@ -114,7 +108,8 @@ angular
   'kbSapiService'
   'kbAppVersion'
   'kbc.app.External.config'
-  ($rootScope, storageErrorHandler, storageService, appVersion, appConfig) ->
+  '$rootElement'
+  ($rootScope, storageErrorHandler, storageService, appVersion, appConfig, $rootElement) ->
     getComponentConfig = (id) ->
       component = _.find(appConfig.components, (component) ->
         component.id == id
@@ -134,5 +129,5 @@ angular
     # put configs to rootScope to be simple accesible in all views and controllers
     $rootScope.appVersion = appVersion
     $rootScope.appConfig = appConfig
-
+    $rootElement.find('ng-view').addClass('app-external-authorization')
 ])

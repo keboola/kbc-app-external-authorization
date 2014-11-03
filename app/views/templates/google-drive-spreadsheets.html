@@ -1,0 +1,86 @@
+<div class="kb-google-drive-spreadsheets">
+  <div class="well" ng-show="filesLoading">
+    Loading the list of spreadsheets from Google Drive account...
+  </div>
+  <div class="alert alert-danger" ng-show="error">
+    {{error}}
+  </div>
+
+  <div class="col-md-12" ng-hide="error">
+    <div class="col-md-5">
+      <kb-search-filter query="search.q" kb-focus="true" ng-hide="empty(gdrive.allfiles.data)"></kb-search-filter>
+      <tabset ng-hide="filesLoading">
+	<tab ng-repeat="tab in [gdrive.my,gdrive.shared,gdrive.bin,gdrive.allfiles]" heading="{{tab.label}}">
+	  <div class="well" ng-hide="tab.data.length">
+	    There are no spreadsheet documents assigned to this account.
+	  </div>
+	  <accordion ng-show="tab.data.length" close-others="false">
+	    <accordion-group ng-repeat="file in tab.data|filter:filterFiles" is-open="file.isopen">
+
+	      <accordion-heading >
+		<a ng-click="loadFileSheetsDetail(file);$event.preventDefault()">{{file.title}}
+		  <kb-loader ng-show="file.loaded || file.loading" is-loading="file.loading" ng-click="refreshFileSheets(file)"></kb-loader></a>
+	      </accordion-heading>
+	      <div class="alert laert-danger" ng-show="file.error">
+		{{file.error}}
+	      </div>
+	      <span ng-hide="true" ng-if="(!file.loaded && !file.loading) && file.isopen">
+		{{loadFileSheetsDetail(file)}}
+	      </span>
+	      <div class="well" ng-hide="(!empty(file.sheets) || file.loading) && !file.error">
+		The spreadsheet document is empty.
+	      </div>
+
+	      <div class="list-group" ng-show="!empty(file.sheets) && (!file.loading) && (!file.error)">
+		<span ng-repeat="(key,sheet) in file.sheets">
+		  <a class="list-group-item sheet-item toselect" ng-class="{'list-group-item-info':sheet.selected}"
+
+		     ng-click="selectSheet(tab.label, file, sheet)"
+		     tooltip="click to select"
+		     ng-if="!sheet.inProject">{{sheet.sheetTitle}}
+		  </a>
+		  <span class="list-group-item sheet-item configured" ng-if="sheet.inProject" tooltip="already configured in project">{{sheet.sheetTitle}}
+		  </span>
+		</span>
+	      </div>
+	      <div class="well" ng-show="file.loading">
+		Loading sheets...
+	      </div>
+	    </accordion-group>
+	  </accordion>
+	</tab>
+      </tabset>
+    </div>
+    <div class="col-md-7" ng-hide="filesLoading">
+
+      <div class="panel panel-default" ng-hide="empty(configured)">
+	<div class="panel-heading">Sheets already configured in project
+	</div>
+	<div class="panel-body">
+	  <ul class="list-group">
+	    <li class="list-group-item sheet-item configured" ng-repeat="sheet in configured">
+	      {{sheet.tab}}  <strong>/</strong>  {{sheet.title}}  <strong>/</strong>  {{sheet.sheetTitle}}
+	    </li>
+	  </ul>
+	</div>
+      </div>
+
+      <div class="panel panel-info">
+	<div class="panel-heading">Selected sheets to be added to the project
+	</div>
+	<div class="panel-body">
+	  <p ng-show="empty(sheetsToSave)" class="text-center"> No sheets selected.</p>
+	  <ul class="list-group" ng-hide="empty(sheetsToSave)">
+	    <li class="list-group-item list-group-item-info sheet-item selected" ng-repeat="sel in sheetsToSave">
+	      {{sel.tab}}  <strong>/</strong>  {{sel.title}}  <strong>/</strong>  {{sel.sheetTitle}}
+	      <button type="button" class="close" ng-click="deselectSheet(sel)">
+		<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+	      </button>
+	    </li>
+	  </ul>
+	</div>
+      </div>
+    </div>
+
+  </div>
+</div>

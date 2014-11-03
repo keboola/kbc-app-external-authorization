@@ -9,28 +9,24 @@ angular.module('kbc.app.External')
     "$window"
     "$sce"
     "kbc.app.External.config"
-    (storageService, $routeParams, $q, csv,  $http, $location, $window, $sce, config) ->
+    "$rootScope"
+    (storageService, $routeParams, $q, csv,  $http, $location, $window, $sce, config, $rootScope) ->
 
       configBucketName = "ex-googleDrive"
       configBucketId = "sys.c-" + configBucketName
-      configTableName = $routeParams.account
+      configTableName = $location.search()["account"]#$routeParams.config
       configTableId = configBucketId + "." + configTableName
       gdriveAccount = {}
       externalLink = null
 
-      defaultEndpoint = 'https://syrup.keboola.com/ex-google-drive'
-
-
       #GOOGLE DRIVE EXTRACTOR URL:
-      endpoint = ''
+      endpoint =  ''
 
       #set gdrive ex URL from given config
       angular.forEach(config.components, (component) ->
         if component.id == 'ex-google-drive'
           endpoint = component.uri
       )
-      endpoint = defaultEndpoint
-
 
       postSheetsUrl= endpoint + '/sheets'
       getFilesUrl = endpoint + '/files'
@@ -43,6 +39,10 @@ angular.module('kbc.app.External')
 
       sheetHeader = ["fileId","googleId","title","sheetId","sheetTitle","config"]
 
+      http = (params) ->
+        $http(params).error (data, status, headers, config) =>
+          return if _.isEmpty data # load canceled usually
+          $rootScope.$broadcast('storageError', data)
 
 
       #-----------------------------------
@@ -51,13 +51,7 @@ angular.module('kbc.app.External')
       appendTokenToHeader = (params) ->
         params.headers = {} if !params.headers
         angular.extend params.headers,
-          'X-StorageApi-Token': $routeParams.token
-
-
-
-
-
-
+          'X-StorageApi-Token': storageService.apiToken
 
       #-----------------------------------
       # Reset google drive account
@@ -69,6 +63,14 @@ angular.module('kbc.app.External')
           googleId : null
           accessToken : null
           refreshToken : null
+
+
+      _getFilesFromGdrive = () ->
+        params =
+          url: getFilesUrl + "/#{configTableName}"
+          method: 'GET'
+        appendTokenToHeader(params)
+        http(params)
 
 
       #-----------------------------------
@@ -101,6 +103,7 @@ angular.module('kbc.app.External')
         res.googleName = data.googleName
         res
 
+
       getAuthUrl: () =>
         return getAuthUrl
 
@@ -112,7 +115,7 @@ angular.module('kbc.app.External')
           url: getAuthUrl
           method: 'GET'
         appendTokenToHeader(params)
-        $http(params).
+        http(params).
           success((data) ->
             #console.log data
             #console.log data['auth-url']
@@ -138,9 +141,6 @@ angular.module('kbc.app.External')
       # return external link
       externalLink : () -> externalLink
 
-      useDevelEndpoint : () ->
-        endpoint = develEndpoint
-
 
       #-----------------------------------
       # Get external link
@@ -152,7 +152,7 @@ angular.module('kbc.app.External')
           method: 'POST'
           data:
             "account": configTableName
-            "referrer": "TODO!"
+            "referrer": "https://s3.amazonaws.com/kbc-apps.keboola.com/ex-authorize/index.html#/googledrive"
         appendTokenToHeader(params)
         $http(params)
           .success (data) ->
@@ -206,18 +206,26 @@ angular.module('kbc.app.External')
           url: getFileSheetsUrl + "/#{configTableName}/#{fileId}"
           method: 'GET'
         appendTokenToHeader(params)
-        $http(params)
+        http(params)
+
+
+      getFilesFromGdrivePromise: () ->
+        fp = $q.defer()
+        _getFilesFromGdrive().success( (result) ->
+          fp.resolve(result)
+        )
+        .error( (err) ->
+          fp.reject(err)
+        )
+        fp
+
+
 
       #-----------------------------------
       # get files from google drive
       #---------------------------------
       getFilesFromGdrive : () ->
-        params =
-          url: getFilesUrl + "/#{configTableName}"
-          method: 'GET'
-        appendTokenToHeader(params)
-
-        $http(params)
+        _getFilesFromGdrive()
 
       #-----------------------------------
       # Retrieve gdrive account from SAPIs
@@ -251,19 +259,17 @@ angular.module('kbc.app.External')
           method: 'POST'
         appendTokenToHeader(params)
 
-        $http(params)
+        http(params)
 
       #-----------------------------------
       # Delete sheets
       #--------------------------------
       deleteSheet: (sheetsToDelete) ->
-
         params=
           url: deleteSheetUrl + "/#{configTableName}/#{sheetsToDelete.fileId}/#{sheetsToDelete.sheetId}"
           method: 'DELETE'
         appendTokenToHeader(params)
-
-        $http(params)
+        http(params)
 
 
       #-----------------------------------

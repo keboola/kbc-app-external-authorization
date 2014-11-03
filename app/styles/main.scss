@@ -1,3 +1,51 @@
-
 /** App specific styles **/
+.app-external-authorization .inline
+{
+display:inline;
+}
 
+/** GOOGLE DRIVE ADD SHEETS DIRECTIVE  **/
+
+.kb-google-drive-spreadsheets .sheet-item{
+padding: 4px 4px;
+text-align: center;
+margin-bottom: 5px;
+}
+
+.kb-google-drive-spreadsheets .sheet-item.configured
+{
+background-color:whitesmoke;
+
+}
+
+.kb-google-drive-spreadsheets .sheet-item.toselect
+{
+cursor: pointer;
+
+}
+
+.kb-google-drive-spreadsheets accordion .panel-heading
+{
+padding: 4px 4px;
+text-align: center;
+cursor: pointer;
+
+}
+
+.kb-google-drive-spreadsheets accordion .panel-group
+{
+margin-top:4px;
+
+}
+
+.kb-google-drive-spreadsheets accordion .panel-body
+{
+padding: 7px 7px 0;
+
+}
+
+.kb-google-drive-spreadsheets  .list-group .well
+{
+padding: 7px 8px;
+margin: 0px;
+}

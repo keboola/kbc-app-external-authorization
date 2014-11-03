@@ -1,0 +1,36 @@
+﻿<div class="page-header">
+  <div class="container">
+    <span>
+      <h4  class="inline">
+  Spreadsheets of {{account.email}}
+  <!--<kb-run-button
+      class="btn" tooltip="Run this config" is-running="isRunning()" ng-click="run()"></kb-run-button>-->
+      </h4>
+      <kb-loader is-loading="filesLoading" ng-click="refreshFiles()"></kb-loader>
+
+      <span class="pull-right" ng-hide="filesLoading || goingtoindex">
+  <span class="text-error pull-right">{{error}}</span>
+  <kb-loader is-loading="isSaving" ng-show="isSaving"></kb-loader>
+  <button class="btn btn-default pull-center" ng-click="goToIndex()" ng-disabled="isSaving || filesLoading">Cancel</button>
+  <button class="btn btn-primary pull-center" ng-click="submit()" ng-disabled="isSaving || filesLoading || sheetsToSave.length == 0">Save selection</button>
+      </span>
+
+    </span>
+  </div>
+
+</div>
+
+<div class="container">
+  <div class="row">
+    <div class="well" ng-show="goingtoindex && successMessage">
+      {{successMessage}}
+    </div>
+    <google-drive-spreadsheets ng-hide="goingtoindex"
+             owner-email="{{account.email}}"
+             gd-service="gdService"
+             already-configured="sheets"
+             gdrive-files-promise="gdFilesPromise"
+             sheets-to-save = "sheetsToSave"
+             ></google-drive-spreadsheets>
+  </div>
+</div>
