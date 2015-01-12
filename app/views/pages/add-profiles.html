@@ -1,78 +1,135 @@
 ﻿<div class="page-header">
-    <div class="container">
+  <div class="container">
+    <h4 class="inline">
+      <a href="{{ appConfig.parentPage.url }}">{{ appConfig.parentPage.title }}</a> /
+      <a ng-click="goToIndex()">Google Analytics - {{ configName }} </a> / Profiles
+    </h4>
+    <kb-loader is-loading="loading" ng-show="loading" tooltip="loading profiles.."></kb-loader>
 
-        <h4 class="inline">
-           
-            <span>Google Analytics - Select Profiles </span>            
-            <!--<kb-run-button               
-                 class="btn" tooltip="Run this config" is-running="isRunning()" ng-click="run()"></kb-run-button>-->
-        </h4>
-        <kb-loader is-loading="loading" ng-show="loading" tooltip="loading profiles.."></kb-loader>
+    <span class="pull-right" ng-hide="loading || goingToIndex">
+      <kb-loader is-loading="isSaving" ng-show="isSaving"></kb-loader>
+      <button class="btn btn-primary pull-center" ng-click="submit()" ng-disabled="isSaving || selectedProfiles.length == 0">Save selection</button>
+    </span>
 
-    </div>
+  </div>
 
 </div>
 
-<div class="row">
-        <div class="col-md-12">
-            <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
-        </div>
+<div class="container kb-gaex" ng-hide="goingToIndex">
+
+  <div class="row">
+    <div class="col-md-12">
+      {{ configDescription }}
     </div>
+  </div>
 
-
-
-<div class="container">
-
-    <div class="row">
-        <div class="col-md-12">
-            {{ configDescription }}
-        </div>
+  <div class="row">
+    <div class="col-md-12">
+      <alert ng-repeat="alert in alerts" type="{{alert.type}}" close="closeAlert($index)">{{alert.msg}}</alert>
     </div>
+  </div>
 
-    <div class="row">
-        <div class="col-md-12">
-            <alert ng-repeat="alert in alerts" type="alert.type" close="closeAlert($index)">{{alert.msg}}</alert>
-        </div>
-    </div>
-
-    
-
-    <div class="col-md-12" ng-hide="loading">
-        <h4>Select profiles</h4>
-        <input type="text" class="form-control" placeholder="type to filter" ng-model="q" />
-        <div class="well">
-
-            <ul class="list-unstyled list-inline">
-                <li ng-repeat="profile in profiles|filter:q">
-                    <button  class="btn btn-default btn-xs" ng-click="selectProfile(profile.googleId)" ng-disabed="isSaving">
-                        {{profile.name}}</button>
-                </li>
-            </ul>
-        </div>
-    </div>
-
-
-    <div class="col-md-12" ng-hide="loading">
-        <h4>Selected profiles:</h4>
-        <div class="well">
-            <ul class="list-unstyled list-inline">
-                <li ng-repeat="profile in selectedProfiles">
-                    <button class="btn btn-default btn-xs">
-                        {{profile.name}}
-                        <button type="button" class="close" ng-click="unselectProfile(profile.googleId)" ng-disabed="isSaving">&times;</button>
-                    </button>
-                </li>
-            </ul>
-
-        </div>
+  <div class="row" ng-show="loading">
+    <div class="well" >
+      <p>Loading profiles...</p>
 
     </div>
+  </div>
 
-    <div class="form-actions" ng-hide="loading">
-        <span class="text-error pull-right">{{error}}</span>
-        <kb-loader is-loading="isSaving" ng-show="isSaving"></kb-loader>
-        <!--<button class="btn btn-default pull-center" ng-click="cancel()" ng-disabled="isSaving">Cancel</button> -->
-        <button class="btn btn-primary pull-center" ng-click="submit()" ng-disabled="isSaving|| !selectedProfiles.length ">Save selection</button>
-
+  <div class="row" ng-hide="loading">
+    <div class="col-md-6">
+      <div class="panel panel-default">
+	<div class="panel-heading">
+	  <h3 class="panel-title">Profiles of {{account.email}}:</h3>
+	</div>
+	<div class="panel-body">
+	  <!-- <kb-search-filter query="search.q" kb-focus="true" ></kb-search-filter> -->
+	  <accordion>
+	    <accordion-group ng-repeat="(key,value) in rawProfiles" heading="{{key}}">
+	      <accordion>
+		<accordion-group ng-repeat="(propname,propvalue) in value" heading="{{propname}}">
+		  <div class="list-group">
+		    <a class="list-group-item pointer text-center"
+		       ng-repeat="item in propvalue"
+		       ng-class="{'list-group-item-info':item.selected}"
+		       ng-click="selectProfileEx(key, propname, item)">
+		      {{item['name']}}
+		    </a>
+		  </div>
+		</accordion-group>
+	      </accordion>
+	    </accordion-group>
+	  </accordion>
+	</div>
+      </div>
     </div>
+
+    <div class="col-md-6">
+      <div class="panel panel-info">
+	<div class="panel-heading">
+	  <h3 class="panel-title">Selected profiles</h3>
+	</div>
+	<div class="panel-body">
+	  <div class="well" ng-hide="selectedProfiles.length">
+	    No profiles selected.
+	  </div>
+	  <div class="list-group">
+	    <a ng-click="unselectProfileEx(profile)"
+	       class="list-group-item list-group-item-info pointer text-center"
+	       ng-repeat="profile in selectedProfiles">
+	      {{profile.accountName}} <strong>/</strong> {{profile.webPropertyName}} <strong>/</strong> {{profile.name}}
+
+	      <button type="button" class="close" ng-click="deselectSheet(sel)">
+		<span aria-hidden="true">&times;</span><span class="sr-only">Close</span>
+	      </button>
+	    </a>
+	  </div>
+	</div>
+      </div>
+    </div>
+
+  </div>
+
+
+
+
+
+  <!-- <div class="row"> -->
+  <!--   <div class="col-md-12" ng-hide="loading"> -->
+  <!--     <h4>Select profiles</h4> -->
+  <!--     <input type="text" class="form-control" placeholder="type to filter" ng-model="q" /> -->
+  <!--     <div class="well"> -->
+
+  <!--  <ul class="list-unstyled list-inline"> -->
+  <!--    <li ng-repeat="profile in profiles|filter:q"> -->
+  <!--      <button tooltip="click to select" class="btn btn-default btn-xs" ng-click="selectProfile(profile.googleId)" ng-disabed="isSaving"> -->
+  <!--        {{profile.name}}</button> -->
+  <!--    </li> -->
+  <!--  </ul> -->
+  <!--     </div> -->
+  <!--   </div> -->
+
+
+  <!--   <div class="col-md-12" ng-hide="loading"> -->
+  <!--     <h4>Selected profiles:</h4> -->
+  <!--     <div class="well"> -->
+  <!--  <ul class="list-unstyled list-inline"> -->
+  <!--    <li ng-repeat="profile in selectedProfiles"> -->
+  <!--      <button class="btn btn-default btn-xs" ng-click="unselectProfile(profile.googleId)" tooltip="click to unselect"> -->
+  <!--        {{profile.name}} -->
+  <!--        <\!-- <button type="button" class="close" ng-click="unselectProfile(profile.googleId)" ng-disabed="isSaving">×</button> -\-> -->
+  <!--      </button> -->
+  <!--    </li> -->
+  <!--  </ul> -->
+
+  <!--     </div> -->
+  <!--   </div> -->
+
+  <!-- <div ng-hide="loading" class="col-md-12"> -->
+  <!--   <span class="text-error pull-right">{{error}}</span> -->
+  <!--   <\!--<button class="btn btn-default pull-center" ng-click="cancel()" ng-disabled="isSaving">Cancel</button> -\-> -->
+  <!--   <button class="btn btn-primary pull-center" ng-click="submit()" ng-disabled="isSaving|| !selectedProfiles.length ">Save selection</button> -->
+  <!--   <kb-loader is-loading="isSaving" ng-show="isSaving"></kb-loader> -->
+  <!-- </div> -->
+
 </div>

@@ -4,6 +4,33 @@
 display:inline;
 }
 
+/** GOOGLE ANALYTIS ADD PROFILE  **/
+.kb-gaex .pointer
+{
+ cursor:pointer;
+}
+
+.kb-gaex .list-group-item{
+
+ margin-bottom: 4px;
+ padding: 4px;
+}
+
+.kb-gaex .panel-body{
+ padding:4px 2px 0px 8px;
+
+}
+
+.kb-gaex .panel-heading
+{
+ padding: 6px 0px 5px 7px;
+}
+.kb-gaex .action-buttons{
+ padding-right: 0px;
+ padding-left: 0px;
+}
+
+
 /** GOOGLE DRIVE ADD SHEETS DIRECTIVE  **/
 
 .kb-google-drive-spreadsheets .sheet-item{
