@@ -19,6 +19,14 @@ angular.module('kbc.app.External')
         file.loaded = false
         $scope.loadFileSheetsDetail(file)
 
+      $scope.viewFileLink =  (file) ->
+        file.alternateLink
+
+      $scope.viewSheetLink = (file, sheet) ->
+        filelink = $scope.viewFileLink(file)
+        filelink + "#gid=#{sheet.id}"
+
+
       #,--------------------------------
       #| load sheet detail
       #`--------------------------------
@@ -110,12 +118,25 @@ angular.module('kbc.app.External')
       $scope.$on "refreshGdFiles", () ->
         $scope.init()
 
-      #,--------------------------------------------------
-      #| init load files from gdrive and prepare to labels
-      #`--------------------------------------------------
-      $scope.init = () ->
-        $scope.error = null
-        $scope.filesLoading = true
+      $scope.parseAllData = () ->
+        _.forEach($scope.gdrive.allfiles.data,(file) ->
+          owner = _.find(file.owners, (owner) ->
+            owner.emailAddress == $scope.ownerEmail
+          )
+
+          if file.explicitlyTrashed
+            $scope.gdrive.bin.data.push(file)
+            $scope.checkConfigured($scope.gdrive.bin.label, file)
+          else
+            if owner
+              $scope.checkConfigured($scope.gdrive.my.label, file)
+              $scope.gdrive.my.data.push(file)
+            else
+              $scope.checkConfigured($scope.gdrive.shared.label, file)
+              $scope.gdrive.shared.data.push(file)
+        )#end foreach
+
+      $scope.initStructure = ->
         $scope.gdrive =
           my:
             label:"My Drive"
@@ -129,28 +150,41 @@ angular.module('kbc.app.External')
           allfiles:
             label:"All Spreadsheets"
             data: []
+
+      #,--------------------------------------------------
+      #| init load files from gdrive and prepare to labels
+      #`--------------------------------------------------
+      $scope.init = () ->
+        $scope.nextPageToken = null
+        $scope.error = null
+        $scope.filesLoading = true
+        $scope.initStructure()
         $scope.gdriveFilesPromise().then (result) ->
           $scope.filesLoading = false
           $scope.gdrive.allfiles.data = result.items
-          _.forEach($scope.gdrive.allfiles.data,(file) ->
-            owner = _.find(file.owners, (owner) ->
-              owner.emailAddress == $scope.ownerEmail
-            )
-
-            if file.explicitlyTrashed
-              $scope.gdrive.bin.data.push(file)
-              $scope.checkConfigured($scope.gdrive.bin.label, file)
-            else
-              if owner
-                $scope.checkConfigured($scope.gdrive.my.label, file)
-                $scope.gdrive.my.data.push(file)
-              else
-                $scope.checkConfigured($scope.gdrive.shared.label, file)
-                $scope.gdrive.shared.data.push(file)
-          )#end foreach
+          $scope.nextPageToken = result.nextPageToken
+          $scope.parseAllData()
         , (err) ->
           $scope.filesLoading = false
           $scope.error = "Failed to load google drive documents"
+
+      $scope.loadNextPage = ->
+        $scope.loadingMore = true
+        $scope.gdService.getFilesFromGdrive($scope.nextPageToken).then (result) ->
+          $scope.gdrive.my.data = []
+          $scope.gdrive.shared.data = []
+          $scope.gdrive.bin.data = []
+
+          $scope.loadingMore = false
+          newItems = _.union($scope.gdrive.allfiles.data, result.data?.items)
+          $scope.gdrive.allfiles.data = newItems
+          $scope.nextPageToken = result.data?.nextPageToken
+          $scope.parseAllData()
+        , (err) ->
+          $scope.loadingMore = false
+          $scope.error = "Failed to load more files."
+
+
       $scope.init()
 
       ]

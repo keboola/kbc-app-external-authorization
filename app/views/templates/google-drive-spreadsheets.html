@@ -18,8 +18,16 @@
 	    <accordion-group ng-repeat="file in tab.data|filter:filterFiles" is-open="file.isopen">
 
 	      <accordion-heading >
-		<a ng-click="loadFileSheetsDetail(file);$event.preventDefault()">{{file.title}}
-		  <kb-loader ng-show="file.loaded || file.loading" is-loading="file.loading" ng-click="refreshFileSheets(file)"></kb-loader></a>
+		<a class="pull-left"
+		   target="_blank"
+		   href="{{viewFileLink(file)}}">
+		  <small>preview</small>
+		</a>
+
+		<a ng-click="loadFileSheetsDetail(file);$event.preventDefault()">
+		  {{file.title}}
+		  <kb-loader ng-show="file.loaded || file.loading" is-loading="file.loading" ng-click="refreshFileSheets(file)"></kb-loader>
+		</a>
 	      </accordion-heading>
 	      <div class="alert laert-danger" ng-show="file.error">
 		{{file.error}}
@@ -32,16 +40,28 @@
 	      </div>
 
 	      <div class="list-group" ng-show="!empty(file.sheets) && (!file.loading) && (!file.error)">
-		<span ng-repeat="(key,sheet) in file.sheets">
-		  <a class="list-group-item sheet-item toselect" ng-class="{'list-group-item-info':sheet.selected}"
+		<div ng-repeat="(key,sheet) in file.sheets" class="col-sm-12">
+
+		  <a class="col-sm-2 previewsheet"
+		     target="_blank"
+		     tooltip="preview sheet in google docs"
+		     href="{{viewSheetLink(file,sheet)}}">
+		    <small>preview</small>
+		  </a>
+
+		  <a class="col-sm-10 list-group-item sheet-item toselect" ng-class="{'list-group-item-info':sheet.selected}"
 
 		     ng-click="selectSheet(tab.label, file, sheet)"
 		     tooltip="click to select"
-		     ng-if="!sheet.inProject">{{sheet.sheetTitle}}
+		     ng-if="!sheet.inProject">
+
+		    {{sheet.sheetTitle}}
 		  </a>
-		  <span class="list-group-item sheet-item configured" ng-if="sheet.inProject" tooltip="already configured in project">{{sheet.sheetTitle}}
+		  <span class="col-sm-10 list-group-item sheet-item configured" ng-if="sheet.inProject" tooltip="already configured in project">{{sheet.sheetTitle}}
 		  </span>
-		</span>
+
+
+		</div>
 	      </div>
 	      <div class="well" ng-show="file.loading">
 		Loading sheets...
@@ -50,6 +70,13 @@
 	  </accordion>
 	</tab>
       </tabset>
+      <button type="button" class="btn btn-default"
+	      ng-click="loadNextPage()"
+	      ng-show="nextPageToken"
+	      ng-disabled="loadingMore">
+	Load More...
+	<kb-loader is-loading="true" ng-show="loadingMore"></kb-loader>
+      </button>
     </div>
     <div class="col-md-7" ng-hide="filesLoading">
 

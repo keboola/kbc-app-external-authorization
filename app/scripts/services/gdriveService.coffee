@@ -65,9 +65,11 @@ angular.module('kbc.app.External')
           refreshToken : null
 
 
-      _getFilesFromGdrive = () ->
+      _getFilesFromGdrive = (nextPageToken) ->
+        nextpage = ""
+        nextpage = "/#{nextPageToken}" if nextPageToken
         params =
-          url: getFilesUrl + "/#{configTableName}"
+          url: getFilesUrl + "/#{configTableName}" + nextpage
           method: 'GET'
         appendTokenToHeader(params)
         http(params)
@@ -224,8 +226,8 @@ angular.module('kbc.app.External')
       #-----------------------------------
       # get files from google drive
       #---------------------------------
-      getFilesFromGdrive : () ->
-        _getFilesFromGdrive()
+      getFilesFromGdrive : (nextPageToken) ->
+        _getFilesFromGdrive(nextPageToken)
 
       #-----------------------------------
       # Retrieve gdrive account from SAPIs
